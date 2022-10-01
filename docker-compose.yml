@@ -1,10 +1,6 @@
-networks:
-  dunodockernet:
-    driver: bridge
-
 services:
   api:
-    container_name: duno-api
+    container_name: derailed-api
     restart: unless-stopped
     depends_on:
       - redis
@@ -13,18 +9,15 @@ services:
       - kafka
     ports:
       - "5000:5000"
-    build:
-      context: .
-      dockerfile: duno-api/Dockerfile
-    networks:
-      - dunodockernet
+    image: "ghcr.io/derailedapp/derailed-api:master"
     environment:
       - STORAGE_URI=redis://redis:6379
       - MONGO_URI=mongodb://mongo:27017
       - KAFKA_URI=kafka:9092
+      - INSTANCE_NAME=one.derailed.docker
 
   gateway:
-    container_name: duno-gateway
+    container_name: derailed-gateway
     restart: unless-stopped
     depends_on:
       - redis
@@ -33,40 +26,38 @@ services:
       - kafka
     ports:
       - "7000:7000"
-    build:
-      context: .
-      dockerfile: duno-gateway/Dockerfile
-    networks:
-      - dunodockernet
+    image: "ghcr.io/derailedapp/derailed-gateway:master"
     environment:
       - RATE_LIMIT_URI=redis://redis:6379
       - MONGO_URI=mongodb://mongo:27017
       - KAFKA_URI=kafka:9092
+      - PORT=7000
 
+  jan:
+    container_name: jan
+    restart: unless-stopped
+    depends_on:
+      - gateway
+      - api
+    ports:
+      - "443:443"
+      - "80:80"
+    image: "ghcr.io/derailedapp/jan:master"
+    environment:
+      - SERVER_NAME=derailed.one
+      - API_URL=api
   redis:
     image: eqalpha/keydb
-    ports:
-      - "6379:6379"
-    networks:
-      - dunodockernet
 
   mongo:
     image: mongo
-    ports:
-      - "27017:27017"
     volumes:
       - ./.data/db:/data/db
-    networks:
-      - dunodockernet
 
   zookeeper:
     image: 'bitnami/zookeeper:latest'
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
-    ports:
-      - "2181:2181"
-    networks:
-      - dunodockernet
 
   kafka:
     image: 'bitnami/kafka:latest'
@@ -79,7 +70,3 @@ services:
       - KAFKA_ADVERTISED_HOST_NAME=kafka
     depends_on:
       - zookeeper
-    ports:
-      - "9092:9092"
-    networks:
-      - dunodockernet
