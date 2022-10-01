@@ -46,6 +46,7 @@ services:
     environment:
       - SERVER_NAME=derailed.one
       - API_URL=api
+
   redis:
     image: eqalpha/keydb
 
