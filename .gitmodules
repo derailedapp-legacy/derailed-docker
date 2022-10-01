@@ -1,6 +1,0 @@
-[submodule "duno-api"]
-	path = duno-api
-	url = https://github.com/dunochat/duno-api
-[submodule "duno-gateway"]
-	path = duno-gateway
-	url = https://github.com/dunochat/duno-gateway
