@@ -1,4 +1,11 @@
 services:
+  app:
+    container_name: derailed-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    image: "ghcr.io/derailedapp/derailed-app:master"
+
   api:
     container_name: derailed-api
     restart: unless-stopped
@@ -45,6 +52,7 @@ services:
     image: "ghcr.io/derailedapp/jan:master"
     environment:
       - SERVER_NAME=derailed.one
+      - APP_URL=app
       - API_URL=api
       - GATEWAY_URL=gateway
 
