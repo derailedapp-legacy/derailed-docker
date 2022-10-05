@@ -49,7 +49,7 @@ services:
     ports:
       - "443:443"
       - "80:80"
-    image: "ghcr.io/derailedapp/jan:master"
+    image: "ghcr.io/derailedapp/january:master"
     environment:
       - SERVER_NAME=derailed.one
       - APP_URL=app
